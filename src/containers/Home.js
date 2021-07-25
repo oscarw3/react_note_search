@@ -136,9 +136,9 @@ export default function Home() {
     return (
       <div className="notes">
         <h2 className="pb-3 mt-4 mb-3 border-bottom">Your Notes</h2>
-        <input className="pb-3 mt-4 mb-3 border-bottom" value={findKeyword} type="text" placeholder="Search for notes.." onChange={(e)=>searchNotes(e)}></input>
-        <input className="pb-3 mt-4 mb-3 border-bottom" value={replaceKeyword} type="text" placeholder="Replace" onChange={(e)=>setReplace(e)}></input>
-        <input type="button" value="Replace" disabled={!findKeyword || !replaceKeyword || isLoading} onClick={()=>replace()}></input>
+        <input className="pb-3 mt-4 mb-3 py-3 text-nowrap text-truncate font-weight-bold" value={findKeyword} type="text" placeholder="Search for notes.." onChange={(e)=>searchNotes(e)}></input>
+        <input className="pb-3 mt-4 mb-3 py-3 text-nowrap text-truncate font-weight-bold" value={replaceKeyword} type="text" placeholder="Replace" onChange={(e)=>setReplace(e)}></input>
+        <input className="btn btn-info" type="button" value="Replace" disabled={!findKeyword || !replaceKeyword || isLoading || filteredNotes.length === 0} onClick={()=>replace()}></input>
         <ListGroup>{!isLoading && renderNotesList(filteredNotes)}</ListGroup>
       </div>
     );
