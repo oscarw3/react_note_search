@@ -7,6 +7,7 @@ import App from './App';
 import config from './config';
 import { initSentry } from './libs/errorLib';
 import reportWebVitals from './reportWebVitals';
+import { usePromiseTracker } from "react-promise-tracker";
 
 initSentry();
 
@@ -34,10 +35,20 @@ Amplify.configure({
   }
 });
 
+// see https://www.basefactor.com/react-how-to-display-a-loading-indicator-on-fetch-calls for example this is based on
+const LoadingIndicator = props => {
+  const { promiseInProgress } = usePromiseTracker();
+  return (
+    promiseInProgress && 
+    <h1>async in progress </h1>
+  );  
+}
+
 ReactDOM.render(
   <React.StrictMode>
     <Router>
       <App />
+      <LoadingIndicator/>
     </Router>
   </React.StrictMode>,
   document.getElementById('root')

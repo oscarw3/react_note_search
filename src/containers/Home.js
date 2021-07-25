@@ -6,6 +6,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import { LinkContainer } from "react-router-bootstrap";
 import { useAppContext } from "../libs/contextLib";
 import { onError } from "../libs/errorLib";
+import { trackPromise } from 'react-promise-tracker';
 import "./Home.css";
 
 export default function Home() {
@@ -35,7 +36,7 @@ export default function Home() {
   }, [isAuthenticated]);
 
   function loadNotes() {
-    return API.get("notes", "/notes");
+    return  trackPromise(API.get("notes", "/notes"));
   }
 
   // reset notes and keywords to all notes, and remove any previously used keywords to filter
