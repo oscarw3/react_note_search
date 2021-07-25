@@ -13,6 +13,8 @@ export default function Home() {
   const { isAuthenticated } = useAppContext();
   const [isLoading, setIsLoading] = useState(true);
   const [allNotes, setAllNotes] = useState([]);
+  const [findKeyword, setFindKeyword] = useState([]);
+  const [replaceKeyword, setReplaceKeyword] = useState([]);
 
   useEffect(() => {
     async function onLoad() {
@@ -21,9 +23,7 @@ export default function Home() {
       }
 
       try {
-        const notes = await loadNotes();
-        setAllNotes(notes);
-        setFilteredNotes(notes);
+        await resetNotes();
       } catch (e) {
         onError(e);
       }
@@ -36,6 +36,15 @@ export default function Home() {
 
   function loadNotes() {
     return API.get("notes", "/notes");
+  }
+
+  // reset notes and keywords to all notes, and remove any previously used keywords to filter
+  async function resetNotes() {
+    setFindKeyword('');
+    setReplaceKeyword('');
+    const notes = await loadNotes();
+    setAllNotes(notes);
+    setFilteredNotes(notes);
   }
 
   function renderNotesList(notes) {
@@ -83,18 +92,50 @@ export default function Home() {
 
   function searchNotes(event) {
     // https://medium.com/crobyer/search-filter-with-react-js-88986c644ed5
-    let keyword = event.target.value;
-    const notesWithKeyword = allNotes.filter(({nodeId, content, createdAt}) => {
-      return content.includes(keyword);
+    const currKeyword = event.target.value;
+    setFindKeyword(currKeyword);
+
+    if (!currKeyword) {
+      setFilteredNotes(allNotes);
+      return;
+    } 
+
+    const notesWithKeyword = allNotes.filter(({noteId, content, createdAt}) => {
+      return content.includes(currKeyword);
     });
     setFilteredNotes(notesWithKeyword);
+  }
+
+  function setReplace(event) {
+    const currKeyword = event.target.value;
+    setReplaceKeyword(currKeyword);
+  }
+
+  // replace notes that contain findKeyword with the replaceKeyword
+  async function replace() {
+    await Promise.all(filteredNotes.map(async (note) => {
+      try {
+        await API.put("notes", `/notes/${note.noteId}`, {
+          body: {
+            content: note.content.replace(findKeyword, replaceKeyword),
+            attachment: note.attachment,
+          }
+        });
+        // console.log(`updated note ${note.noteId} with findKeyword: ${findKeyword} and replaceKeyword: ${replaceKeyword}`);
+      } catch (e) {
+        onError(e);
+      }
+    }));
+    await resetNotes();
   }
 
   function renderNotes() {
     return (
       <div className="notes">
         <h2 className="pb-3 mt-4 mb-3 border-bottom">Your Notes</h2>
-        <input className="pb-3 mt-4 mb-3 border-bottom" type="text" placeholder="Search for notes.." onChange={(e)=>searchNotes(e)}></input>
+        <input className="pb-3 mt-4 mb-3 border-bottom" value={findKeyword} type="text" placeholder="Search for notes.." onChange={(e)=>searchNotes(e)}></input>
+        <input className="pb-3 mt-4 mb-3 border-bottom" value={replaceKeyword} type="text" placeholder="Replace" onChange={(e)=>setReplace(e)}></input>
+        <input type="button" value="Replace" disabled={!findKeyword || !replaceKeyword} onClick={()=>replace()}></input>
         <ListGroup>{!isLoading && renderNotesList(filteredNotes)}</ListGroup>
       </div>
     );
