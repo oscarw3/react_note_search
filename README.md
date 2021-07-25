@@ -8,6 +8,7 @@ This repo is a modified frontend React app based on the demo react app found her
 Since this is a demo app, this is just for experimenting with react and the serverless stack. There are multiple ways in which it can be improved upon and should if productionized, for example:
 - Adding highlighting when words have been selected
 - Validations of the input text (handling super large texts, for example)
+- Improve UI/css of the search bars and replace button
 Just to name a few!
 
 #### Usage
