@@ -9,9 +9,10 @@ import { onError } from "../libs/errorLib";
 import "./Home.css";
 
 export default function Home() {
-  const [notes, setNotes] = useState([]);
+  const [filteredNotes, setFilteredNotes] = useState([]);
   const { isAuthenticated } = useAppContext();
   const [isLoading, setIsLoading] = useState(true);
+  const [allNotes, setAllNotes] = useState([]);
 
   useEffect(() => {
     async function onLoad() {
@@ -21,7 +22,8 @@ export default function Home() {
 
       try {
         const notes = await loadNotes();
-        setNotes(notes);
+        setAllNotes(notes);
+        setFilteredNotes(notes);
       } catch (e) {
         onError(e);
       }
@@ -79,11 +81,21 @@ export default function Home() {
     );
   }
 
+  function searchNotes(event) {
+    // https://medium.com/crobyer/search-filter-with-react-js-88986c644ed5
+    let keyword = event.target.value;
+    const notesWithKeyword = allNotes.filter(({nodeId, content, createdAt}) => {
+      return content.includes(keyword);
+    });
+    setFilteredNotes(notesWithKeyword);
+  }
+
   function renderNotes() {
     return (
       <div className="notes">
         <h2 className="pb-3 mt-4 mb-3 border-bottom">Your Notes</h2>
-        <ListGroup>{!isLoading && renderNotesList(notes)}</ListGroup>
+        <input className="pb-3 mt-4 mb-3 border-bottom" type="text" placeholder="Search for notes.." onChange={(e)=>searchNotes(e)}></input>
+        <ListGroup>{!isLoading && renderNotesList(filteredNotes)}</ListGroup>
       </div>
     );
   }
