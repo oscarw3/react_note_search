@@ -6,6 +6,7 @@ import LoaderButton from "../components/LoaderButton";
 import { onError } from "../libs/errorLib";
 import { s3Upload } from "../libs/awsLib";
 import config from "../config";
+import { trackPromise } from 'react-promise-tracker';
 import "./Notes.css";
 
 export default function Notes() {
@@ -19,7 +20,7 @@ export default function Notes() {
 
   useEffect(() => {
     function loadNote() {
-      return API.get("notes", `/notes/${id}`);
+      return trackPromise(API.get("notes", `/notes/${id}`));
     }
 
     async function onLoad() {

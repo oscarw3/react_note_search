@@ -24,7 +24,7 @@ export default function Home() {
       }
 
       try {
-        await resetNotes();
+        await trackPromise(resetNotes());
       } catch (e) {
         onError(e);
       }
@@ -114,6 +114,7 @@ export default function Home() {
 
   // replace notes that contain findKeyword with the replaceKeyword
   async function replace() {
+    setIsLoading(true);
     await Promise.all(filteredNotes.map(async (note) => {
       try {
         await API.put("notes", `/notes/${note.noteId}`, {
@@ -127,7 +128,8 @@ export default function Home() {
         onError(e);
       }
     }));
-    await resetNotes();
+    await trackPromise(resetNotes());
+    setIsLoading(false);
   }
 
   function renderNotes() {
@@ -136,7 +138,7 @@ export default function Home() {
         <h2 className="pb-3 mt-4 mb-3 border-bottom">Your Notes</h2>
         <input className="pb-3 mt-4 mb-3 border-bottom" value={findKeyword} type="text" placeholder="Search for notes.." onChange={(e)=>searchNotes(e)}></input>
         <input className="pb-3 mt-4 mb-3 border-bottom" value={replaceKeyword} type="text" placeholder="Replace" onChange={(e)=>setReplace(e)}></input>
-        <input type="button" value="Replace" disabled={!findKeyword || !replaceKeyword} onClick={()=>replace()}></input>
+        <input type="button" value="Replace" disabled={!findKeyword || !replaceKeyword || isLoading} onClick={()=>replace()}></input>
         <ListGroup>{!isLoading && renderNotesList(filteredNotes)}</ListGroup>
       </div>
     );
