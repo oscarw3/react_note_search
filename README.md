@@ -17,7 +17,7 @@ This project is created using [Create React App](https://github.com/facebookincu
 To use this repo locally, start by cloning it and installing the NPM packages.
 
 ``` bash
-$ git clone
+$ git clone git@github.com:oscarw3/react_note_search.git
 $ npm install
 ```
 
